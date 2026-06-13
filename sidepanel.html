@@ -481,10 +481,10 @@ input[type=file] { display: none; }
 .banner.info { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); color: #93c5fd; }
 .banner b { font-weight: 700; }
 
-/* Mode info banner (always visible) */
-.mode-info-banner {
+/* Info banner (always visible) */
+.info-banner {
   background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid rgba(56, 189, 248, 0.2);
   border-radius: var(--radius-lg);
   padding: 10px 14px;
   margin-bottom: 14px;
@@ -544,8 +544,8 @@ code { background: rgba(56, 189, 248, 0.08); padding: 1px 5px; border-radius: 4p
 <!-- ═══ ĐIỀU KHIỂN ═══ -->
 <div class="panel active" id="panel-control">
 
-  <!-- Mode Info Banner (always visible) -->
-  <div class="mode-info-banner">🎙️ Chế độ: AI Studio Text-to-Speech</div>
+  <!-- TTS Mode Info Banner (always visible) -->
+  <div class="info-banner">🎙️ Chế độ: AI Studio Text-to-Speech</div>
 
   <!-- Prompts -->
   <div class="label">
@@ -563,7 +563,7 @@ code { background: rgba(56, 189, 248, 0.08); padding: 1px 5px; border-radius: 4p
   <!-- Live Parsed Prompt Preview Box -->
   <div class="preview-header">🔍 Danh sách quét được (Kiểm soát lỗi)</div>
   <div id="prompt-preview-container" class="preview-box">
-    <div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán nội dung ở trên.</div>
+    <div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán văn bản ở trên.</div>
   </div>
 
   <div class="import-row">
@@ -598,7 +598,7 @@ code { background: rgba(56, 189, 248, 0.08); padding: 1px 5px; border-radius: 4p
 
     <!-- Live Preview -->
     <div class="path-bar" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; font-size: 11px;">
-      <span id="pb-preview" style="color: var(--accent2); word-break: break-all;">VEO_Automation\tên-dự-án\ÂM THANH\2026-06-13\am_thanh\001_SCENE.wav</span>
+      <span id="pb-preview" style="color: var(--accent2); word-break: break-all;">VEO_Automation\tên-dự-án\ÂM THANH\2026-06-14\am_thanh\001_SCENE.wav</span>
     </div>
   </div>
 
