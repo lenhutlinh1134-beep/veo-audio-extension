@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEO Audio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0f;
+  --surface: #12121a;
+  --surface-hover: #181826;
+  --surface-glass: rgba(18, 18, 26, 0.7);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(56, 189, 248, 0.4);
+  --accent: #38bdf8;
+  --accent-rgb: 56, 189, 248;
+  --accent2: #6c63ff;
+  --accent2-rgb: 108, 99, 255;
+  --red: #ff4757;
+  --yellow: #ffd32a;
+  --blue: #38bdf8;
+  --text: #f1f1f6;
+  --text-muted: #8e8e9f;
+  --text-dark: #4e4e5e;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.2));
+}
+.header-title { font-weight: 700; font-size: 15px; color: #fff; letter-spacing: -0.2px; }
+.header-sub { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+.ver {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(108, 99, 255, 0.15);
+  color: var(--accent2);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(108, 99, 255, 0.3);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 2px 6px 0;
+}
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s ease;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Panels */
+.panel { display: none; padding: 14px 16px 80px; }
+.panel.active { display: block; }
+
+/* Field row */
+.field-row { display: flex; gap: 8px; align-items: flex-end; }
+.field { flex: 1; }
+.field label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.field input, .field select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 11px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font);
+  transition: all 0.2s ease;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+.field input::placeholder { color: var(--text-dark); }
+
+/* Prompt area */
+.label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.label .cnt {
+  margin-left: auto;
+  font-family: var(--font);
+  font-size: 11px;
+}
+
+/* Badges */
+.badge-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: none;
+}
+.badge-prompts {
+  background: rgba(108, 99, 255, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(108, 99, 255, 0.3);
+}
+.badge-outputs {
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  line-height: 1.5;
+  min-height: 100px;
+  transition: all 0.2s ease;
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+textarea::placeholder { color: var(--text-dark); }
+
+/* Parsed Prompt Preview Container */
+.preview-header {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-top: 10px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.preview-box {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+.preview-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.15s ease;
+}
+.preview-item:last-child { margin-bottom: 0; }
+.preview-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.preview-title {
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.preview-title .idx {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 8px;
+}
+.preview-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: monospace;
+}
+
+/* Import row */
+.import-row { display: flex; gap: 6px; margin: 6px 0 12px; flex-wrap: wrap; }
+.btn-sm {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-sm:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-color: var(--accent2);
+}
+input[type=file] { display: none; }
+
+/* Settings */
+.settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 10px; }
+
+/* Path Builder */
+.path-builder { background:rgba(56,189,248,0.03); border:1px solid rgba(56,189,248,0.15); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+.pb-hd { font-size:10px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:7px; }
+.path-bar { display:flex; flex-wrap:wrap; align-items:center; gap:0; background:rgba(0,0,0,0.25); border-radius:8px; padding:7px 10px; min-height:32px; }
+.pb-fixed { color:var(--text-muted); font-family:monospace; font-size:11px; }
+.pb-sep { color:rgba(255,255,255,0.2); font-family:monospace; font-size:11px; padding:0 3px; }
+.pb-input { background:transparent; border:none; outline:none; color:var(--text); font-family:monospace; font-size:11px; padding:1px 4px; border-radius:4px; min-width:10px; }
+.pb-input:focus { background:rgba(108,99,255,0.18); }
+.pb-input:hover:not(:focus) { background:rgba(108,99,255,0.08); }
+.pb-input::placeholder { color:rgba(255,255,255,0.2); }
+.pb-auto { color:#86efac; font-family:monospace; font-size:11px; }
+.pb-file { color:rgba(255,255,255,0.25); font-family:monospace; font-size:11px; font-style:italic; }
+.pb-chips { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; align-items:center; }
+.pb-chip { padding:3px 9px; border-radius:20px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:var(--text-muted); font-size:10px; cursor:pointer; transition:all 0.15s; }
+.pb-chip.active { border-color:rgba(56,189,248,0.5); background:rgba(56,189,248,0.1); color:var(--accent); }
+
+/* Buttons */
+.action-row { display: flex; gap: 8px; margin: 12px 0 8px; }
+.btn-test {
+  width: 100%;
+  padding: 9px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  background: rgba(108, 99, 255, 0.06);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  margin-bottom: 6px;
+  transition: all .2s ease;
+}
+.btn-test:hover {
+  background: rgba(108, 99, 255, 0.12);
+  border-color: var(--accent2);
+  color: #fff;
+}
+.btn-start {
+  flex: 1;
+  padding: 11px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #0284c7);
+  color: #000;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .2s ease;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+}
+.btn-start:hover {
+  opacity: .95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.25);
+}
+.btn-start:active { transform: translateY(0); }
+.btn-stop {
+  padding: 11px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--red);
+  background: transparent;
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .2s ease;
+}
+.btn-stop:hover { background: var(--red); color: #fff; }
+
+/* Progress */
+.prog-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.prog-box .title {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.prog-bar-wrap { background: rgba(255, 255, 255, 0.05); border-radius: 20px; height: 6px; overflow: hidden; margin-bottom: 10px; }
+.prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 20px; transition: width .4s ease; }
+.prog-counts { display: flex; gap: 12px; font-size: 11px; }
+.prog-counts span { color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.prog-counts .num { font-weight: 700; font-size: 12px; }
+.c-done { color: var(--accent); }
+.c-run { color: var(--yellow); }
+.c-fail { color: var(--red); }
+
+/* Queue list */
+.queue-list { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; padding-right: 2px; }
+.q-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+.q-item.running { border-color: rgba(255, 211, 42, 0.3); background: rgba(255, 211, 42, 0.02); }
+.q-item.done { border-color: rgba(56, 189, 248, 0.2); background: rgba(56, 189, 248, 0.01); }
+.q-item.failed { border-color: rgba(255, 71, 87, 0.3); background: rgba(255, 71, 87, 0.02); }
+.q-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.q-item.running .q-num { background: var(--yellow); color: #000; }
+.q-item.done .q-num { background: var(--accent); color: #000; }
+.q-item.failed .q-num { background: var(--red); color: #fff; }
+.q-info { flex: 1; min-width: 0; }
+.q-text { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; font-weight: 500; }
+.q-status { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+.q-item.running .q-status { color: var(--yellow); }
+.q-item.done .q-status { color: var(--accent); }
+.q-item.failed .q-status { color: var(--red); }
+.q-pbar { background: rgba(255, 255, 255, 0.05); border-radius: 20px; height: 4px; margin-top: 6px; overflow: hidden; }
+.q-pfill { height: 100%; background: var(--accent); border-radius: 20px; transition: width .3s ease; }
+
+/* Settings tab */
+.sg { margin-bottom: 18px; }
+.sg-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 10px;
+}
+.si {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.si:last-child { border: none; }
+.si .lbl { font-size: 12px; color: var(--text); font-weight: 500; }
+.si .desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.toggle {
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background .2s ease;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left .2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toggle.on::after { left: 18px; }
+
+/* Empty */
+.empty { text-align: center; padding: 48px 16px; color: var(--text-dark); }
+.empty .icon { font-size: 36px; margin-bottom: 10px; }
+.empty p { font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+/* Banner */
+.banner {
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  display: none;
+  line-height: 1.4;
+  box-shadow: var(--shadow);
+}
+.banner.ok { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+.banner.error { background: rgba(255, 71, 87, 0.08); border: 1px solid rgba(255, 71, 87, 0.2); color: #fca5a5; }
+.banner.info { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); color: #93c5fd; }
+.banner b { font-weight: 700; }
+
+/* Mode info banner (always visible) */
+.mode-info-banner {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: #7dd3fc;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 9999;
+  box-shadow: var(--shadow);
+}
+.toast.show { opacity: 1; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+code { background: rgba(56, 189, 248, 0.08); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 11px; color: var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">🎙️</div>
+  <div>
+    <div class="header-title">VEO Audio — AI Studio TTS</div>
+    <div class="header-sub">Auto TTS on Google AI Studio</div>
+  </div>
+  <div class="ver">v1.0</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="control">Điều khiển</div>
+  <div class="tab" data-tab="queue">Hàng chờ</div>
+  <div class="tab" data-tab="settings">Cài đặt</div>
+</div>
+
+<!-- ═══ ĐIỀU KHIỂN ═══ -->
+<div class="panel active" id="panel-control">
+
+  <!-- Mode Info Banner (always visible) -->
+  <div class="mode-info-banner">🎙️ Chế độ: AI Studio Text-to-Speech</div>
+
+  <!-- Prompts -->
+  <div class="label">
+    Danh sách Script (mỗi dòng 1 đoạn)
+    <span class="cnt" id="prompt-count">
+      <span class="badge-container">
+        <span class="badge badge-prompts">0 prompt</span>
+        <span class="badge badge-outputs">0 audio</span>
+      </span>
+    </span>
+  </div>
+  <textarea id="prompt-area"
+    placeholder="Nhập nội dung cần đọc...&#10;Mỗi dòng trống phân cách = 1 audio file"></textarea>
+
+  <!-- Live Parsed Prompt Preview Box -->
+  <div class="preview-header">🔍 Danh sách quét được (Kiểm soát lỗi)</div>
+  <div id="prompt-preview-container" class="preview-box">
+    <div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán nội dung ở trên.</div>
+  </div>
+
+  <div class="import-row">
+    <button class="btn-sm" id="btn-import-txt">📄 .txt</button>
+    <button class="btn-sm" id="btn-import-csv">📊 .csv</button>
+    <button class="btn-sm" id="btn-clear">🗑 Xóa</button>
+    <button class="btn-sm" id="btn-sample" style="margin-left:auto">✨ Ví dụ</button>
+  </div>
+  <input type="file" id="f-txt" accept=".txt">
+  <input type="file" id="f-csv" accept=".csv">
+
+  <!-- Path Builder -->
+  <div class="path-builder">
+    <div class="pb-hd">Cấu trúc lưu file</div>
+
+    <div style="margin-bottom: 8px;">
+      <label style="font-size: 10px; color: var(--text-dark); margin-bottom: 4px; display: block;">Thư mục gốc</label>
+      <input class="pb-input" id="inp-root" value="VEO_Automation" placeholder="VEO_Automation" style="width: 100%; border-radius: 4px; padding: 6px; font-size: 11px;">
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <label style="font-size: 10px; color: var(--text-dark); margin-bottom: 4px; display: block;">Tên dự án</label>
+      <input class="pb-input" id="inp-project" list="project-list" placeholder="tên-dự-án" style="width: 100%; border-radius: 4px; padding: 6px; font-size: 11px;">
+      <datalist id="project-list"></datalist>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+      <label style="font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+        <input type="checkbox" id="chk-date" checked> Phân loại theo ngày
+      </label>
+    </div>
+
+    <!-- Live Preview -->
+    <div class="path-bar" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; font-size: 11px;">
+      <span id="pb-preview" style="color: var(--accent2); word-break: break-all;">VEO_Automation\tên-dự-án\ÂM THANH\2026-06-13\am_thanh\001_SCENE.wav</span>
+    </div>
+  </div>
+
+  <!-- Concurrent + Delay -->
+  <div class="settings-row">
+    <div class="field">
+      <label>Luồng (Concurrent)</label>
+      <input type="number" id="inp-concurrent" value="1" min="1" max="2">
+    </div>
+    <div class="field">
+      <label>Delay (giây)</label>
+      <input type="number" id="inp-delay" value="5" min="2" max="120">
+    </div>
+  </div>
+
+  <!-- Banner thông báo -->
+  <div class="banner" id="banner"></div>
+
+  <!-- Buttons -->
+  <button class="btn-test" id="btn-test">🔌 Test kết nối AI Studio</button>
+  <div class="action-row">
+    <button class="btn-start" id="btn-start">▶ Bắt đầu tạo giọng đọc</button>
+    <button class="btn-stop" id="btn-stop" style="display:none">⬛ Dừng</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-box" id="prog-box" style="display:none">
+    <div class="title">Tiến độ</div>
+    <div class="prog-bar-wrap"><div class="prog-bar-fill" id="prog-bar" style="width:0%"></div></div>
+    <div class="prog-counts">
+      <span><span class="num c-done" id="cnt-done">0</span>Xong</span>
+      <span><span class="num c-run" id="cnt-run">0</span>Chạy</span>
+      <span><span class="num c-fail" id="cnt-fail">0</span>Lỗi</span>
+      <span><span class="num" id="cnt-wait">0</span>Chờ</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ HÀNG CHỜ ═══ -->
+<div class="panel" id="panel-queue">
+  <div id="queue-wrap">
+    <div class="empty"><div class="icon">📋</div><p>Chưa có script nào.<br>Vào tab <b>Điều khiển</b> để thêm.</p></div>
+  </div>
+</div>
+
+<!-- ═══ CÀI ĐẶT ═══ -->
+<div class="panel" id="panel-settings">
+
+  <div class="sg">
+    <div class="sg-title">Lưu file</div>
+    <div class="si">
+      <div><div class="lbl">Tổ chức theo ngày</div><div class="desc">Tạo thư mục con YYYY-MM-DD/</div></div>
+      <div class="toggle on" id="tog-organize-by-date" data-key="organizeByDate"></div>
+    </div>
+    <div class="si">
+      <div><div class="lbl">Tự động tải về</div><div class="desc">Tải về máy ngay khi render xong</div></div>
+      <div class="toggle on" id="tog-auto-download" data-key="autoDownload"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="src/sidepanel.js"></script>
+</body>
+</html>
