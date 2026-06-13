@@ -1,4 +1,4 @@
-// sidepanel.js — veo-audio-extension — AI Studio TTS only
+// sidepanel.js — VEO Audio Extension (AI Studio TTS only)
 
 let mode = 'text-to-speech';
 let platform = 'aistudio-speech';
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshState();
   fetchProjects();
 
-  // Tabs
+  // ── Tabs ──
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const name = tab.dataset.tab;
@@ -19,21 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Prompt textarea
+  // ── Prompt textarea ──
   const promptArea = document.getElementById('prompt-area');
   if (promptArea) promptArea.addEventListener('input', countPrompts);
 
-  // Import buttons
+  // ── Import buttons ──
   document.getElementById('btn-import-txt')?.addEventListener('click', () => document.getElementById('f-txt').click());
   document.getElementById('btn-import-csv')?.addEventListener('click', () => document.getElementById('f-csv').click());
   document.getElementById('btn-clear')?.addEventListener('click', clearPrompts);
   document.getElementById('btn-sample')?.addEventListener('click', loadSample);
 
-  // File inputs
+  // ── File inputs ──
   document.getElementById('f-txt')?.addEventListener('change', importTxt);
   document.getElementById('f-csv')?.addEventListener('change', importCsv);
 
-  // Path builder
+  // ── Path builder inputs ──
   document.getElementById('inp-root')?.addEventListener('input', () => { updatePath(); saveSettings(); });
   document.getElementById('inp-project')?.addEventListener('input', () => { updatePath(); saveSettings(); });
 
@@ -43,12 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     saveSettings();
   });
 
-  // Main buttons
+  // ── Main buttons ──
   document.getElementById('btn-test')?.addEventListener('click', testConnection);
   document.getElementById('btn-start')?.addEventListener('click', startQueue);
   document.getElementById('btn-stop')?.addEventListener('click', stopQueue);
 
-  // Toggle switches
+  // ── Toggle switches ──
   document.querySelectorAll('.toggle').forEach(toggle => {
     toggle.addEventListener('click', () => {
       const key = toggle.dataset.key;
@@ -64,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
   countPrompts();
 });
 
-// State updates from background
+// ── Nhận state updates từ background ──
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.type === 'STATE_UPDATE') renderState(msg.state);
 });
 
 // ══════════════════════════
-// PATH PREVIEW
+// ██ PATH PREVIEW
 // ══════════════════════════
 function updatePath() {
   const root = document.getElementById('inp-root')?.value || 'VEO_Automation';
@@ -89,7 +89,7 @@ function updatePath() {
 }
 
 // ══════════════════════════
-// PROMPTS
+// ██ PROMPTS
 // ══════════════════════════
 function countPrompts() {
   const prompts = getPrompts();
@@ -107,7 +107,7 @@ function countPrompts() {
   const previewBox = document.getElementById('prompt-preview-container');
   if (previewBox) {
     if (n === 0) {
-      previewBox.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán nội dung ở trên.</div>';
+      previewBox.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán văn bản ở trên.</div>';
     } else {
       previewBox.innerHTML = prompts.map((p, index) => {
         const title = p.name ? p.name : `Đoạn ${String(index + 1).padStart(2, '0')}`;
@@ -127,12 +127,12 @@ function getPrompts() {
   const text = document.getElementById('prompt-area')?.value || '';
   if (!text.trim()) return [];
 
-  // Split by blank lines first
+  // Split by double newline first
   if (text.includes('\n\n')) {
-    return text.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map(p => ({ text: p, name: '' }));
+    return text.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map(p => ({ text: p.replace(/\n/g, ' '), name: '' }));
   }
 
-  // Each line is one prompt
+  // Fallback: each line is one prompt
   return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => ({ text: l, name: '' }));
 }
 
@@ -146,11 +146,11 @@ function loadSample() {
   const el = document.getElementById('prompt-area');
   if (el) {
     el.value =
-`Xin chào các bạn! Hôm nay chúng ta sẽ cùng tìm hiểu về chủ đề đầu tư tài chính thông minh, giúp bạn xây dựng tương lai vững chắc hơn.
+`Chào mừng bạn đến với kênh học tiếng Anh thực chiến! Hôm nay chúng ta sẽ cùng nhau khám phá những từ vựng và cụm từ thông dụng nhất trong giao tiếp hàng ngày, giúp bạn tự tin hơn khi nói chuyện với người nước ngoài.
 
-Một trong những nguyên tắc quan trọng nhất trong đầu tư là phân bổ tài sản hợp lý. Bạn nên chia danh mục thành ba phần: an toàn, tăng trưởng và cơ hội, để cân bằng rủi ro và lợi nhuận.
+Phần đầu tiên, chúng ta sẽ học về cách chào hỏi và giới thiệu bản thân. Đây là kỹ năng cơ bản nhưng vô cùng quan trọng, tạo ấn tượng tốt ngay từ giây đầu tiên gặp gỡ. Hãy cùng thực hành nhé!
 
-Hãy bắt đầu ngay hôm nay, dù chỉ với một số tiền nhỏ. Thói quen đầu tư đều đặn theo thời gian sẽ tạo ra sức mạnh lãi kép đáng kinh ngạc. Cảm ơn các bạn đã lắng nghe!`;
+Cuối bài học hôm nay, bạn sẽ nắm vững mười cụm từ chào hỏi tự nhiên và địa đạo nhất. Hãy nhớ luyện tập mỗi ngày để tiến bộ nhanh hơn. Hẹn gặp lại bạn trong bài học tiếp theo!`;
   }
   countPrompts();
 }
@@ -161,7 +161,7 @@ function importTxt(event) {
   r.onload = e => {
     const el = document.getElementById('prompt-area');
     if (el) el.value = e.target.result;
-    countPrompts(); toast('✓ Imported từ .txt');
+    countPrompts(); toast(`✓ Imported từ .txt`);
   };
   r.readAsText(file); event.target.value = '';
 }
@@ -172,7 +172,7 @@ function importCsv(event) {
   r.onload = e => {
     const lines = e.target.result.split('\n')
       .map(l => l.split(',')[0].replace(/^"|"$/g, '').trim())
-      .filter(l => l && l.toLowerCase() !== 'prompt' && l.toLowerCase() !== 'text');
+      .filter(l => l && l.toLowerCase() !== 'text' && l.toLowerCase() !== 'prompt');
     const el = document.getElementById('prompt-area');
     if (el) el.value = lines.join('\n\n');
     countPrompts(); toast(`✓ Imported ${lines.length} đoạn từ CSV`);
@@ -181,7 +181,7 @@ function importCsv(event) {
 }
 
 // ══════════════════════════
-// TEST CONNECTION
+// ██ TEST CONNECTION
 // ══════════════════════════
 async function testConnection() {
   const btn = document.getElementById('btn-test');
@@ -189,10 +189,16 @@ async function testConnection() {
   try {
     const res = await chrome.runtime.sendMessage({ type: 'TEST_CONNECTION', platform: 'aistudio-speech' });
     if (res?.ok) {
-      showBanner(`<b style="color:#7dd3fc">✅ Kết nối AI Studio thành công!</b><br><small>${(res.url || '').replace(/^https?:\/\//, '').slice(0, 60)}</small>`, 'ok');
+      const tabUrl = (res.url || '').replace(/^https?:\/\//, '').slice(0, 50);
+      const inputInfo = res.foundInput ? '✓ Ô nhập' : '⚠ Chưa thấy ô nhập';
+      const submitInfo = res.foundSubmit ? ' · ✓ Nút Tạo' : ' · ⚠ Chưa thấy nút Tạo';
+      const readyState = res.foundInput && res.foundSubmit
+        ? `<b style="color:#7dd3fc">✅ Sẵn sàng tạo giọng đọc!</b>`
+        : `<b style="color:#ff6b6b">⚠ Trang chưa load xong</b>`;
+      showBanner(`${readyState}<br><small>${tabUrl}</small><br><small>${inputInfo}${submitInfo}</small>`, res.foundInput && res.foundSubmit ? 'ok' : 'error');
     } else {
       const hint = res?.reason === 'no_tab'
-        ? 'Chưa tìm thấy tab AI Studio.<br>Hãy mở <b>aistudio.google.com/generate-speech</b> trong Chrome.'
+        ? `Chưa tìm thấy tab AI Studio.<br>Hãy mở <b>aistudio.google.com/u/4/generate-speech</b> trong Chrome.`
         : `Lỗi: ${res?.reason || res?.error || 'không rõ'}`;
       showBanner(`❌ Kết nối thất bại<br><small>${hint}</small>`, 'error');
     }
@@ -201,13 +207,13 @@ async function testConnection() {
 }
 
 // ══════════════════════════
-// START / STOP QUEUE
+// ██ START / STOP QUEUE
 // ══════════════════════════
 async function startQueue() {
   const prompts = getPrompts();
-  if (!prompts.length) { toast('⚠ Chưa có nội dung'); return; }
+  if (!prompts.length) { toast('⚠ Chưa có script'); return; }
 
-  const concurrent = Math.min(parseInt(document.getElementById('inp-concurrent')?.value) || 1, 2);
+  const concurrent = parseInt(document.getElementById('inp-concurrent')?.value) || 1;
   const delaySeconds = parseInt(document.getElementById('inp-delay')?.value) || 5;
 
   chrome.runtime.sendMessage({
@@ -215,7 +221,7 @@ async function startQueue() {
     prompts,
     mode: 'text-to-speech',
     platform: 'aistudio-speech',
-    concurrency: concurrent,
+    concurrency: Math.min(concurrent, 2),
     delaySeconds,
     settings: {
       root: document.getElementById('inp-root')?.value || 'VEO_Automation',
@@ -238,7 +244,7 @@ function stopQueue() {
 }
 
 // ══════════════════════════
-// STATE RENDERING
+// ██ STATE RENDERING
 // ══════════════════════════
 async function refreshState() {
   const s = await chrome.runtime.sendMessage({ type: 'GET_STATE' }).catch(() => null);
@@ -272,11 +278,11 @@ function renderQueue(s) {
   const wrap = document.getElementById('queue-wrap'); if (!wrap) return;
   const all = [...(s.running || []), ...(s.queue || []), ...(s.done || []), ...(s.failed || [])].sort((a, b) => a.id - b.id);
   if (!all.length) {
-    wrap.innerHTML = '<div class="empty"><div class="icon">📋</div><p>Chưa có script nào.<br>Vào <b>Điều khiển</b> để thêm.</p></div>';
+    wrap.innerHTML = '<div class="empty"><div class="icon">📋</div><p>Chưa có script.<br>Vào <b>Điều khiển</b> để thêm.</p></div>';
     return;
   }
   wrap.innerHTML = `<div class="queue-list">${all.map(item => {
-    const statusTxt = { waiting: 'Đang chờ', running: 'Đang tạo audio...', done: '✓ Hoàn thành', failed: `✗ Lỗi: ${item.error || ''}`, stopped: 'Đã dừng' }[item.status] || item.status;
+    const statusTxt = { waiting: 'Đang chờ', running: 'Đang xử lý...', done: '✓ Hoàn thành', failed: `✗ Lỗi: ${item.error || ''}`, stopped: 'Đã dừng' }[item.status] || item.status;
     const bar = item.status === 'running' ? `<div class="q-pbar"><div class="q-pfill" style="width:${item.progress || 0}%"></div></div>` : '';
     const numTxt = item.status === 'done' ? '✓' : item.status === 'failed' ? '✗' : item.id;
     return `<div class="q-item ${item.status}">
@@ -291,19 +297,13 @@ function renderQueue(s) {
 }
 
 // ══════════════════════════
-// SETTINGS
+// ██ SETTINGS
 // ══════════════════════════
 function loadSettings() {
   chrome.storage.local.get(['veoAudioSettings', 'veoRoot', 'veoProject'], d => {
     if (d.veoAudioSettings) settings = { ...settings, ...d.veoAudioSettings };
-    if (d.veoRoot) {
-      const el = document.getElementById('inp-root');
-      if (el) el.value = d.veoRoot;
-    }
-    if (d.veoProject) {
-      const el = document.getElementById('inp-project');
-      if (el) el.value = d.veoProject;
-    }
+    if (d.veoRoot) document.getElementById('inp-root').value = d.veoRoot;
+    if (d.veoProject) document.getElementById('inp-project').value = d.veoProject;
 
     const chkDate = document.getElementById('chk-date');
     if (chkDate) chkDate.checked = !!settings.organizeByDate;
@@ -338,12 +338,12 @@ async function fetchProjects() {
       }
     }
   } catch (e) {
-    // Backend not running, skip
+    // Backend không chạy, bỏ qua
   }
 }
 
 // ══════════════════════════
-// HELPERS
+// ██ HELPERS
 // ══════════════════════════
 function toast(msg) {
   const el = document.getElementById('toast'); if (!el) return;
