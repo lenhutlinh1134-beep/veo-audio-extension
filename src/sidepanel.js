@@ -4,6 +4,9 @@ let mode = 'text-to-speech';
 let platform = 'aistudio-speech';
 let settings = { organizeByDate: true, autoDownload: true, skipOnError: true, retryOnError: true };
 
+// ══════════════════════════════════════
+// ██ INIT
+// ══════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   updatePath();
@@ -85,7 +88,9 @@ function updatePath() {
   const end = '\\' + subLabel + '\\001_SCENE.wav';
 
   const preview = document.getElementById('pb-preview');
-  if (preview) preview.textContent = mid + end;
+  if (preview) {
+    preview.textContent = mid + end;
+  }
 }
 
 // ══════════════════════════
@@ -107,7 +112,7 @@ function countPrompts() {
   const previewBox = document.getElementById('prompt-preview-container');
   if (previewBox) {
     if (n === 0) {
-      previewBox.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán văn bản ở trên.</div>';
+      previewBox.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dark);font-size:11px;">Chưa phát hiện đoạn nào. Hãy điền/dán nội dung ở trên.</div>';
     } else {
       previewBox.innerHTML = prompts.map((p, index) => {
         const title = p.name ? p.name : `Đoạn ${String(index + 1).padStart(2, '0')}`;
@@ -132,7 +137,7 @@ function getPrompts() {
     return text.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map(p => ({ text: p.replace(/\n/g, ' '), name: '' }));
   }
 
-  // Fallback: each line is one prompt
+  // Each line as one prompt
   return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => ({ text: l, name: '' }));
 }
 
@@ -146,11 +151,11 @@ function loadSample() {
   const el = document.getElementById('prompt-area');
   if (el) {
     el.value =
-`Chào mừng bạn đến với kênh học tiếng Anh thực chiến! Hôm nay chúng ta sẽ cùng nhau khám phá những từ vựng và cụm từ thông dụng nhất trong giao tiếp hàng ngày, giúp bạn tự tin hơn khi nói chuyện với người nước ngoài.
+`Xin chào! Hôm nay chúng ta sẽ cùng khám phá những bí quyết giúp bạn học tiếng Anh hiệu quả hơn, nhanh hơn và thú vị hơn. Hãy bắt đầu ngay nhé!
 
-Phần đầu tiên, chúng ta sẽ học về cách chào hỏi và giới thiệu bản thân. Đây là kỹ năng cơ bản nhưng vô cùng quan trọng, tạo ấn tượng tốt ngay từ giây đầu tiên gặp gỡ. Hãy cùng thực hành nhé!
+Bước đầu tiên là xây dựng thói quen nghe hàng ngày. Chỉ cần 15 đến 20 phút mỗi ngày nghe podcast hoặc xem video tiếng Anh có phụ đề, bạn sẽ thấy sự tiến bộ rõ rệt sau chỉ một tháng.
 
-Cuối bài học hôm nay, bạn sẽ nắm vững mười cụm từ chào hỏi tự nhiên và địa đạo nhất. Hãy nhớ luyện tập mỗi ngày để tiến bộ nhanh hơn. Hẹn gặp lại bạn trong bài học tiếp theo!`;
+Bước thứ hai là không ngại mắc lỗi. Ngôn ngữ được học qua thực hành, không phải qua lý thuyết. Hãy nói, viết và giao tiếp càng nhiều càng tốt — mỗi lỗi sai là một bài học quý giá trên con đường chinh phục tiếng Anh.`;
   }
   countPrompts();
 }
@@ -160,7 +165,7 @@ function importTxt(event) {
   const r = new FileReader();
   r.onload = e => {
     const el = document.getElementById('prompt-area');
-    if (el) el.value = e.target.result;
+    if (el) el.value = e.target.result.trim();
     countPrompts(); toast(`✓ Imported từ .txt`);
   };
   r.readAsText(file); event.target.value = '';
@@ -172,7 +177,7 @@ function importCsv(event) {
   r.onload = e => {
     const lines = e.target.result.split('\n')
       .map(l => l.split(',')[0].replace(/^"|"$/g, '').trim())
-      .filter(l => l && l.toLowerCase() !== 'text' && l.toLowerCase() !== 'prompt');
+      .filter(l => l && l.toLowerCase() !== 'prompt' && l.toLowerCase() !== 'text');
     const el = document.getElementById('prompt-area');
     if (el) el.value = lines.join('\n\n');
     countPrompts(); toast(`✓ Imported ${lines.length} đoạn từ CSV`);
@@ -193,7 +198,7 @@ async function testConnection() {
       const inputInfo = res.foundInput ? '✓ Ô nhập' : '⚠ Chưa thấy ô nhập';
       const submitInfo = res.foundSubmit ? ' · ✓ Nút Tạo' : ' · ⚠ Chưa thấy nút Tạo';
       const readyState = res.foundInput && res.foundSubmit
-        ? `<b style="color:#7dd3fc">✅ Sẵn sàng tạo giọng đọc!</b>`
+        ? `<b style="color:#38bdf8">✅ Sẵn sàng chạy!</b>`
         : `<b style="color:#ff6b6b">⚠ Trang chưa load xong</b>`;
       showBanner(`${readyState}<br><small>${tabUrl}</small><br><small>${inputInfo}${submitInfo}</small>`, res.foundInput && res.foundSubmit ? 'ok' : 'error');
     } else {
@@ -211,9 +216,9 @@ async function testConnection() {
 // ══════════════════════════
 async function startQueue() {
   const prompts = getPrompts();
-  if (!prompts.length) { toast('⚠ Chưa có script'); return; }
+  if (!prompts.length) { toast('⚠ Chưa có nội dung'); return; }
 
-  const concurrent = parseInt(document.getElementById('inp-concurrent')?.value) || 1;
+  const concurrent = Math.min(parseInt(document.getElementById('inp-concurrent')?.value) || 1, 2);
   const delaySeconds = parseInt(document.getElementById('inp-delay')?.value) || 5;
 
   chrome.runtime.sendMessage({
@@ -221,7 +226,7 @@ async function startQueue() {
     prompts,
     mode: 'text-to-speech',
     platform: 'aistudio-speech',
-    concurrency: Math.min(concurrent, 2),
+    concurrency: concurrent,
     delaySeconds,
     settings: {
       root: document.getElementById('inp-root')?.value || 'VEO_Automation',
@@ -278,7 +283,7 @@ function renderQueue(s) {
   const wrap = document.getElementById('queue-wrap'); if (!wrap) return;
   const all = [...(s.running || []), ...(s.queue || []), ...(s.done || []), ...(s.failed || [])].sort((a, b) => a.id - b.id);
   if (!all.length) {
-    wrap.innerHTML = '<div class="empty"><div class="icon">📋</div><p>Chưa có script.<br>Vào <b>Điều khiển</b> để thêm.</p></div>';
+    wrap.innerHTML = '<div class="empty"><div class="icon">📋</div><p>Chưa có đoạn nào.<br>Vào <b>Điều khiển</b> để thêm.</p></div>';
     return;
   }
   wrap.innerHTML = `<div class="queue-list">${all.map(item => {
@@ -302,8 +307,14 @@ function renderQueue(s) {
 function loadSettings() {
   chrome.storage.local.get(['veoAudioSettings', 'veoRoot', 'veoProject'], d => {
     if (d.veoAudioSettings) settings = { ...settings, ...d.veoAudioSettings };
-    if (d.veoRoot) document.getElementById('inp-root').value = d.veoRoot;
-    if (d.veoProject) document.getElementById('inp-project').value = d.veoProject;
+    if (d.veoRoot) {
+      const el = document.getElementById('inp-root');
+      if (el) el.value = d.veoRoot;
+    }
+    if (d.veoProject) {
+      const el = document.getElementById('inp-project');
+      if (el) el.value = d.veoProject;
+    }
 
     const chkDate = document.getElementById('chk-date');
     if (chkDate) chkDate.checked = !!settings.organizeByDate;
