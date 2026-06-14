@@ -6,6 +6,20 @@
   "permissions": ["activeTab", "scripting", "storage", "downloads", "sidePanel", "tabs"],
   "host_permissions": ["https://aistudio.google.com/*"],
   "background": { "service_worker": "src/background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://aistudio.google.com/*"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/injected.js"],
+      "matches": ["https://aistudio.google.com/*"]
+    }
+  ],
   "action": { "default_title": "VEO Audio TTS" },
   "side_panel": { "default_path": "sidepanel.html" },
   "icons": {
