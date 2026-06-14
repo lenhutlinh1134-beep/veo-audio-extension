@@ -136,17 +136,19 @@ async function runItem(item, mode, platform, delayMs, settings = {}) {
   setStatus(`<div>⌨️ Nhập prompt #${item.id}...</div>`);
   const typeResult = await callInjected('TYPE_TEXT', { text: item.text });
   if (!typeResult.ok) throw new Error(`Nhập text thất bại: ${typeResult.error}`);
-  await sleep(1500);
-  prog(item.id, 30);
+  await sleep(500);
 
   // ── Chụp snapshot TRƯỚC khi submit ──
   const snapSrcs = takeMediaSnapshot(mode);
 
-  // Click submit
-  setStatus(`<div>🚀 Gửi prompt...</div>`);
+  // NGAY LẬP TỨC nhấn Submit sau khi nhận diện prompt trong ô nhập
+  setStatus(`<div>🚀 Phát hiện prompt → Submit ngay!</div>`);
   const submitResult = await callInjected('CLICK_SUBMIT');
   if (!submitResult.ok) throw new Error(`Gửi thất bại: ${submitResult.error}`);
-  await sleep(3000);
+
+  // Chỉ sau khi submit thành công mới bắt đầu đếm %
+  prog(item.id, 30);
+  await sleep(2000);
   prog(item.id, 40);
 
   // Chờ kết quả

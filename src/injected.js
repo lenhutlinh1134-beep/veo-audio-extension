@@ -378,10 +378,10 @@
     }
 
     if (input) {
-      return { ok: true, method: 'enter-key-only' };
+      return { ok: false, error: 'Không tìm thấy nút Submit (Run). Trang chưa load đầy đủ — thử lại sau vài giây.' };
     }
 
-    return { ok: false, error: 'Không tìm thấy nút Generate hoặc ô nhập. Trang chưa load xong hoặc Google đã đổi UI?' };
+    return { ok: false, error: 'Không tìm thấy nút Submit hoặc ô nhập. Trang chưa load xong hoặc AI Studio đã đổi UI?' };
   }
 
   // ── Utility ──
