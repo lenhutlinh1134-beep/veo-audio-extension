@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VEO TTS Tool — Edge Neural Voices</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0b14;color:#e0e0f0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;font-size:22px;font-weight:700;color:#00e5a0;margin-bottom:4px}
+.subtitle{text-align:center;color:#666;font-size:12px;margin-bottom:20px}
+.card{background:#12121e;border:1px solid #1e1e30;border-radius:14px;padding:18px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:700;color:#00e5a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.layout{display:grid;grid-template-columns:1fr 280px;gap:14px}
+@media(max-width:700px){.layout{grid-template-columns:1fr}}
+label{display:block;font-size:11px;color:#888;margin-bottom:4px;margin-top:10px}
+label:first-child{margin-top:0}
+textarea{width:100%;background:#0d0d1a;border:1px solid #252535;border-radius:8px;color:#e0e0f0;font-size:13px;line-height:1.6;padding:12px;resize:vertical;min-height:320px;outline:none;transition:border .2s}
+textarea:focus{border-color:#00e5a0}
+select,input[type=text],input[type=number]{width:100%;background:#0d0d1a;border:1px solid #252535;border-radius:8px;color:#e0e0f0;font-size:13px;padding:8px 10px;outline:none;transition:border .2s}
+select:focus,input:focus{border-color:#00e5a0}
+input[type=range]{width:100%;accent-color:#00e5a0;margin:6px 0}
+.speed-row{display:flex;align-items:center;gap:8px}
+.speed-row span{font-size:13px;font-weight:600;color:#00e5a0;white-space:nowrap;min-width:38px}
+.chunk-preview{background:#0d0d1a;border:1px solid #252535;border-radius:8px;padding:8px 12px;font-size:12px;color:#888;margin-top:8px}
+.chunk-preview strong{color:#00e5a0}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+#btn-gen{background:linear-gradient(135deg,#00e5a0,#00b4d8);color:#000;flex:1}
+#btn-gen:hover:not(:disabled){filter:brightness(1.1)}
+#btn-gen:disabled{opacity:.45;cursor:not-allowed}
+#btn-preview{background:#1e1e30;color:#ccc;border:1px solid #333}
+#btn-preview:hover:not(:disabled){background:#252535}
+#btn-preview:disabled{opacity:.4;cursor:not-allowed}
+#btn-stop{background:#ff4757;color:#fff;display:none}
+#btn-stop:hover{background:#ff6b6b}
+#btn-zip{background:#1e1e30;color:#00e5a0;border:1px solid #00e5a040;display:none}
+#btn-zip:hover{background:#252535}
+.progress-wrap{background:#0d0d1a;border-radius:100px;height:8px;overflow:hidden;margin-top:14px}
+#prog-bar{height:100%;background:linear-gradient(90deg,#00e5a0,#00b4d8);border-radius:100px;width:0%;transition:width .3s}
+#status-text{font-size:12px;color:#aaa;margin-top:6px;min-height:18px}
+.log-wrap{max-height:220px;overflow-y:auto;margin-top:10px}
+.log-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1a1a28;font-size:12px}
+.log-item:last-child{border-bottom:none}
+.log-icon{font-size:14px;flex-shrink:0}
+.log-name{color:#ccc;flex:1}
+.log-dur{color:#666;font-size:11px;white-space:nowrap}
+.log-status{font-size:11px;padding:2px 8px;border-radius:4px}
+.log-ok{background:#00e5a015;color:#00e5a0}
+.log-err{background:#ff475715;color:#ff4757}
+.log-wait{color:#666}
+.voice-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0}
+.voice-btn{background:#0d0d1a;border:1px solid #252535;border-radius:8px;padding:10px;cursor:pointer;text-align:left;transition:all .15s}
+.voice-btn:hover{border-color:#00e5a040}
+.voice-btn.active{border-color:#00e5a0;background:#00e5a010}
+.voice-btn .vname{font-size:12px;font-weight:600;color:#e0e0f0}
+.voice-btn .vdesc{font-size:10px;color:#666;margin-top:2px}
+.voice-flag{font-size:16px}
+.tips{font-size:11px;color:#555;line-height:1.6;margin-top:6px}
+.tips a{color:#00e5a060}
+</style>
+</head>
+<body>
+<h1>🎙️ VEO TTS Tool</h1>
+<p class="subtitle">Microsoft Edge Neural TTS — 100% Free · Không cần API key · Tiếng Việt + Tiếng Anh</p>
+
+<div class="layout">
+  <!-- LEFT: Script -->
+  <div>
+    <div class="card">
+      <div class="card-title">📝 Kịch bản</div>
+      <label>Dán kịch bản vào đây (mỗi đoạn cách nhau bằng dòng trống hoặc <code style="color:#00e5a0">---</code>)</label>
+      <textarea id="script" placeholder="Đoạn 1: Xin chào, đây là video về...
+
+---
+
+Đoạn 2: Trong video hôm nay chúng ta sẽ...
+
+Đoạn 3: Hãy bắt đầu ngay thôi!"></textarea>
+      <div class="chunk-preview" id="chunk-info">Chưa có nội dung</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Tiến độ</div>
+      <div class="btn-row">
+        <button id="btn-preview">▶ Nghe thử đoạn 1</button>
+        <button id="btn-gen">🎙️ Tạo tất cả</button>
+        <button id="btn-stop">⏹ Dừng</button>
+        <button id="btn-zip">📦 Tải ZIP</button>
+      </div>
+      <div class="progress-wrap"><div id="prog-bar"></div></div>
+      <div id="status-text">Sẵn sàng</div>
+      <div class="log-wrap"><div id="log"></div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Settings -->
+  <div>
+    <div class="card">
+      <div class="card-title">🎤 Giọng đọc</div>
+      <div class="voice-group" id="voice-group">
+        <div class="voice-btn active" data-voice="vi-VN-HoaiMyNeural">
+          <span class="voice-flag">🇻🇳</span>
+          <div class="vname">HoaiMy</div>
+          <div class="vdesc">Nữ · Bắc · Neural</div>
+        </div>
+        <div class="voice-btn" data-voice="vi-VN-NamMinhNeural">
+          <span class="voice-flag">🇻🇳</span>
+          <div class="vname">NamMinh</div>
+          <div class="vdesc">Nam · Bắc · Neural</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-JennyNeural">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Jenny</div>
+          <div class="vdesc">Female · US · Neural</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-GuyNeural">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Guy</div>
+          <div class="vdesc">Male · US · Neural</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-AriaNeural">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Aria</div>
+          <div class="vdesc">Female · US · Expressive</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-DavisNeural">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Davis</div>
+          <div class="vdesc">Male · US · Casual</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Cài đặt</div>
+      <label>Tốc độ đọc</label>
+      <div class="speed-row">
+        <input type="range" id="speed" min="-50" max="100" step="5" value="0">
+        <span id="speed-label">1.0x</span>
+      </div>
+
+      <label>Tên file prefix (tùy chọn)</label>
+      <input type="text" id="prefix" value="AUDIO" placeholder="AUDIO">
+
+      <label>Bắt đầu từ số</label>
+      <input type="number" id="start-num" value="1" min="1" max="999">
+
+      <p class="tips" style="margin-top:12px">
+        ℹ️ File lưu vào thư mục <strong style="color:#ccc">Downloads</strong>.<br>
+        Nếu bị chặn tải nhiều file → nhấn <strong style="color:#ccc">Cho phép</strong> khi trình duyệt hỏi.
+      </p>
+      <div id="server-badge" style="margin-top:8px;font-size:12px;font-weight:600">🔴 Server chưa chạy</div>
+      <div id="ws-error-tip" style="margin-top:10px;background:#ff475712;border:1px solid #ff475730;border-radius:8px;padding:10px;font-size:11px;color:#ff9999;line-height:1.8">
+        ⚠️ <strong>Cần chạy server 1 lần:</strong><br>
+        Mở terminal (Ctrl+`) trong VS Code:<br>
+        <code style="background:#0d0d1a;padding:2px 6px;border-radius:4px;color:#00e5a0">cd tts-server</code><br>
+        <code style="background:#0d0d1a;padding:2px 6px;border-radius:4px;color:#00e5a0">npm install</code><br>
+        <code style="background:#0d0d1a;padding:2px 6px;border-radius:4px;color:#00e5a0">node server.js</code><br>
+        Sau đó mở <strong style="color:#ccc">http://localhost:3000</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ─────────────────────────────────
+let selectedVoice = 'vi-VN-HoaiMyNeural';
+let isStopped = false;
+let generatedBlobs = []; // { name, blob }
+
+// ─── Voice selection ───────────────────────
+document.querySelectorAll('.voice-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.voice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedVoice = btn.dataset.voice;
+  });
+});
+
+// ─── Speed slider ──────────────────────────
+const speedSlider = document.getElementById('speed');
+const speedLabel  = document.getElementById('speed-label');
+speedSlider.addEventListener('input', () => {
+  const pct = parseInt(speedSlider.value);
+  const x = (100 + pct) / 100;
+  speedLabel.textContent = x.toFixed(2) + 'x';
+});
+
+// ─── Script parsing ────────────────────────
+// Chỉ split bằng --- (không split bằng blank lines vì text có nhiều đoạn)
+function parseChunks(text) {
+  return text
+    .split(/\n[ \t]*---[ \t]*(?:\n|$)/)
+    .map(c => c.trim())
+    .filter(c => c.length > 2);
+}
+
+function getChunkName(chunk, idx, prefix, startNum) {
+  // Hỗ trợ: **[AUDIO 01]**, [AUDIO 01], ## Heading
+  const tagMatch = chunk.match(/^\*{0,2}\[([^\]]+)\]\*{0,2}/);
+  const headMatch = chunk.match(/^#{1,3}\s+(.+)/);
+  const num = String(idx + startNum - 1).padStart(3, '0');
+  if (tagMatch) return `${num}_${tagMatch[1].trim().replace(/\s+/g, '_')}`;
+  if (headMatch) return `${num}_${headMatch[1].trim().replace(/\s+/g, '_').slice(0,40)}`;
+  const pfx = prefix.trim() || 'AUDIO';
+  return `${num}_${pfx}`;
+}
+
+function getChunkText(chunk) {
+  // Xóa **[TAG]**, [TAG], ## Heading ở đầu
+  return chunk
+    .replace(/^\*{0,2}\[[^\]]+\]\*{0,2}\s*\n?/, '')
+    .replace(/^#{1,3}\s+.+\n?/, '')
+    .trim();
+}
+
+// ─── Update chunk preview ──────────────────
+const scriptArea = document.getElementById('script');
+const chunkInfo  = document.getElementById('chunk-info');
+scriptArea.addEventListener('input', updatePreview);
+function updatePreview() {
+  const chunks = parseChunks(scriptArea.value);
+  if (chunks.length === 0) {
+    chunkInfo.innerHTML = 'Chưa có nội dung';
+  } else {
+    chunkInfo.innerHTML = `<strong>${chunks.length} đoạn</strong> · ~${chunks.reduce((a,c)=>a+c.length,0)} ký tự`;
+  }
+}
+
+// ─── UUID helper ───────────────────────────
+function uuid() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+// ─── TTS Engine ────────────────────────────
+// Tự nhận biết: nếu đang chạy trên Render.com → dùng same origin
+// Nếu chạy local → dùng localhost:3000
+const SERVER = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : location.origin;
+let serverOk = false;
+
+async function checkServer() {
+  try {
+    const r = await fetch(SERVER + '/api/ping', { signal: AbortSignal.timeout(2000) });
+    serverOk = r.ok;
+  } catch { serverOk = false; }
+  updateServerBadge();
+  return serverOk;
+}
+
+function updateServerBadge() {
+  const el = document.getElementById('server-badge');
+  if (!el) return;
+  el.textContent = serverOk ? '🟢 Server đang chạy' : '🔴 Server chưa chạy';
+  el.style.color  = serverOk ? '#00e5a0' : '#ff4757';
+  document.getElementById('ws-error-tip').style.display = serverOk ? 'none' : 'block';
+}
+
+async function synthesize(text, voice, ratePct) {
+  if (!serverOk) {
+    // Thử lại check server trước khi báo lỗi
+    await checkServer();
+    if (!serverOk) throw new Error('Server chưa chạy — mở terminal chạy: cd tts-server && npm start');
+  }
+
+  const resp = await fetch(SERVER + '/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, voice, rate: ratePct })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${resp.status}`);
+  }
+
+  return await resp.blob();
+}
+
+// ─── Download a blob ───────────────────────
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+// ─── Log helper ────────────────────────────
+function addLog(name, status, extra) {
+  const log  = document.getElementById('log');
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.id = 'log-' + name;
+  item.innerHTML = `
+    <span class="log-icon">${status === 'wait' ? '⏳' : status === 'ok' ? '✅' : '❌'}</span>
+    <span class="log-name">${name}.mp3</span>
+    <span class="log-dur">${extra || ''}</span>
+    <span class="log-status ${status === 'ok' ? 'log-ok' : status === 'err' ? 'log-err' : 'log-wait'}">${status === 'wait' ? 'Đang tạo...' : status === 'ok' ? 'Xong' : 'Lỗi'}</span>
+  `;
+  log.appendChild(item);
+  item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  return item;
+}
+function updateLog(name, status, extra) {
+  const item = document.getElementById('log-' + name);
+  if (!item) return;
+  item.querySelector('.log-icon').textContent = status === 'ok' ? '✅' : '❌';
+  item.querySelector('.log-dur').textContent = extra || '';
+  const s = item.querySelector('.log-status');
+  s.className = `log-status ${status === 'ok' ? 'log-ok' : 'log-err'}`;
+  s.textContent = status === 'ok' ? 'Xong' : 'Lỗi: ' + (extra || '');
+}
+
+function setStatus(text) { document.getElementById('status-text').textContent = text; }
+function setProgress(done, total) {
+  document.getElementById('prog-bar').style.width = total > 0 ? (done / total * 100) + '%' : '0%';
+}
+
+// ─── Generate ALL ──────────────────────────
+document.getElementById('btn-gen').addEventListener('click', generateAll);
+document.getElementById('btn-stop').addEventListener('click', () => { isStopped = true; });
+
+async function generateAll() {
+  const chunks   = parseChunks(scriptArea.value);
+  if (chunks.length === 0) { alert('Chưa có kịch bản! Hãy dán nội dung vào ô bên trái.'); return; }
+
+  const voice    = selectedVoice;
+  const ratePct  = parseInt(speedSlider.value);
+  const prefix   = document.getElementById('prefix').value.trim() || 'AUDIO';
+  const startNum = parseInt(document.getElementById('start-num').value) || 1;
+
+  isStopped = false;
+  generatedBlobs = [];
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('btn-gen').disabled = true;
+  document.getElementById('btn-preview').disabled = true;
+  document.getElementById('btn-stop').style.display = 'inline-block';
+  document.getElementById('btn-zip').style.display = 'none';
+  setProgress(0, chunks.length);
+
+  const startTime = Date.now();
+
+  for (let i = 0; i < chunks.length; i++) {
+    if (isStopped) { setStatus('⏹ Đã dừng sau ' + i + '/' + chunks.length + ' đoạn.'); break; }
+
+    const name = getChunkName(chunks[i], i + 1, prefix, startNum);
+    const text = getChunkText(chunks[i]);
+    if (!text) { setProgress(i + 1, chunks.length); continue; }
+
+    addLog(name, 'wait');
+    setStatus(`⚙️ Đang tạo ${i + 1}/${chunks.length}: ${name}...`);
+
+    const t0 = Date.now();
+    try {
+      const blob = await synthesize(text, voice, ratePct);
+      const dur = ((Date.now() - t0) / 1000).toFixed(1);
+      updateLog(name, 'ok', dur + 's');
+      generatedBlobs.push({ name, blob });
+      downloadBlob(blob, name + '.mp3');
+      setProgress(i + 1, chunks.length);
+      await sleep(350); // tránh browser block multi-download
+    } catch (err) {
+      updateLog(name, 'err', err.message);
+      setProgress(i + 1, chunks.length);
+    }
+  }
+
+  const total = ((Date.now() - startTime) / 1000).toFixed(1);
+  if (!isStopped) setStatus(`✅ Hoàn thành ${chunks.length} đoạn trong ${total}s`);
+
+  document.getElementById('btn-gen').disabled = false;
+  document.getElementById('btn-preview').disabled = false;
+  document.getElementById('btn-stop').style.display = 'none';
+  if (generatedBlobs.length > 0) document.getElementById('btn-zip').style.display = 'inline-block';
+}
+
+// ─── Preview first chunk ───────────────────
+document.getElementById('btn-preview').addEventListener('click', async () => {
+  const chunks = parseChunks(scriptArea.value);
+  if (chunks.length === 0) { alert('Chưa có kịch bản!'); return; }
+  const text    = getChunkText(chunks[0]);
+  const voice   = selectedVoice;
+  const ratePct = parseInt(speedSlider.value);
+  const btn = document.getElementById('btn-preview');
+  btn.disabled = true;
+  setStatus('⚙️ Đang tạo audio thử...');
+  try {
+    const blob = await synthesize(text, voice, ratePct);
+    const url  = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+    audio.onended = () => URL.revokeObjectURL(url);
+    setStatus('▶ Đang phát thử...');
+  } catch(e) {
+    setStatus('❌ Lỗi: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ─── Download ZIP (all in one) ─────────────
+document.getElementById('btn-zip').addEventListener('click', async () => {
+  if (generatedBlobs.length === 0) return;
+  setStatus('📦 Đang nén ZIP...');
+  try {
+    // Simple ZIP builder (no library needed for our case)
+    const zip = await buildZip(generatedBlobs);
+    downloadBlob(zip, 'VEO_Audio_' + new Date().toISOString().slice(0,10) + '.zip');
+    setStatus('✅ Đã tải ZIP!');
+  } catch(e) {
+    setStatus('❌ Lỗi ZIP: ' + e.message);
+  }
+});
+
+// ─── Minimal ZIP builder ───────────────────
+async function buildZip(files) {
+  // Uses File System Access or falls back to JSDelivr for JSZip
+  // If JSZip is available (loaded dynamically), use it
+  if (typeof JSZip === 'undefined') {
+    // Load JSZip dynamically
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  const zip = new JSZip();
+  for (const f of files) zip.file(f.name + '.mp3', f.blob);
+  return zip.generateAsync({ type: 'blob', compression: 'STORE' });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Init
+updatePreview();
+checkServer();
+setInterval(checkServer, 5000); // tự kiểm tra mỗi 5s
+</script>
+</body>
+</html>
