@@ -18,12 +18,26 @@ app.get('/', (_req, res) => res.redirect('/tts-tool.html'));
 
 // ── Map tên giọng Edge TTS → Google Cloud TTS ──
 const VOICE_MAP = {
+  // Vietnamese Neural2 (4 giọng)
+  'vi-VN-Neural2-A': { name: 'vi-VN-Neural2-A', lang: 'vi-VN' },
+  'vi-VN-Neural2-B': { name: 'vi-VN-Neural2-B', lang: 'vi-VN' },
+  'vi-VN-Neural2-C': { name: 'vi-VN-Neural2-C', lang: 'vi-VN' },
+  'vi-VN-Neural2-D': { name: 'vi-VN-Neural2-D', lang: 'vi-VN' },
+  // English Journey (tự nhiên nhất)
+  'en-US-Journey-F': { name: 'en-US-Journey-F', lang: 'en-US' },
+  'en-US-Journey-D': { name: 'en-US-Journey-D', lang: 'en-US' },
+  'en-US-Journey-O': { name: 'en-US-Journey-O', lang: 'en-US' },
+  // English Studio (chất lượng thu âm)
+  'en-US-Studio-O':  { name: 'en-US-Studio-O',  lang: 'en-US' },
+  'en-US-Studio-Q':  { name: 'en-US-Studio-Q',  lang: 'en-US' },
+  // English Neural2
+  'en-US-Neural2-F': { name: 'en-US-Neural2-F', lang: 'en-US' },
+  'en-US-Neural2-J': { name: 'en-US-Neural2-J', lang: 'en-US' },
+  'en-US-Neural2-C': { name: 'en-US-Neural2-C', lang: 'en-US' },
+  'en-US-Neural2-D': { name: 'en-US-Neural2-D', lang: 'en-US' },
+  // Legacy names (backward compat)
   'vi-VN-HoaiMyNeural':  { name: 'vi-VN-Neural2-A', lang: 'vi-VN' },
   'vi-VN-NamMinhNeural': { name: 'vi-VN-Neural2-B', lang: 'vi-VN' },
-  'en-US-JennyNeural':   { name: 'en-US-Neural2-F', lang: 'en-US' },
-  'en-US-GuyNeural':     { name: 'en-US-Neural2-J', lang: 'en-US' },
-  'en-US-AriaNeural':    { name: 'en-US-Neural2-C', lang: 'en-US' },
-  'en-US-DavisNeural':   { name: 'en-US-Neural2-D', lang: 'en-US' },
 };
 
 // ── Health check ──────────────────────────

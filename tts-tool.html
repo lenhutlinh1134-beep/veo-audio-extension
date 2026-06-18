@@ -98,36 +98,62 @@ button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weigh
   <div>
     <div class="card">
       <div class="card-title">🎤 Giọng đọc</div>
+      <!-- 🇻🇳 Vietnamese Neural2 -->
+      <div style="font-size:10px;color:#666;margin-bottom:4px;letter-spacing:1px">🇻🇳 TIẾNG VIỆT</div>
       <div class="voice-group" id="voice-group">
-        <div class="voice-btn active" data-voice="vi-VN-HoaiMyNeural">
+        <div class="voice-btn active" data-voice="vi-VN-Neural2-A">
           <span class="voice-flag">🇻🇳</span>
-          <div class="vname">HoaiMy</div>
-          <div class="vdesc">Nữ · Bắc · Neural</div>
+          <div class="vname">Lan</div>
+          <div class="vdesc">Nữ · Neural2</div>
         </div>
-        <div class="voice-btn" data-voice="vi-VN-NamMinhNeural">
+        <div class="voice-btn" data-voice="vi-VN-Neural2-B">
           <span class="voice-flag">🇻🇳</span>
-          <div class="vname">NamMinh</div>
-          <div class="vdesc">Nam · Bắc · Neural</div>
+          <div class="vname">Minh</div>
+          <div class="vdesc">Nam · Neural2</div>
         </div>
-        <div class="voice-btn" data-voice="en-US-JennyNeural">
-          <span class="voice-flag">🇺🇸</span>
-          <div class="vname">Jenny</div>
-          <div class="vdesc">Female · US · Neural</div>
+        <div class="voice-btn" data-voice="vi-VN-Neural2-C">
+          <span class="voice-flag">🇻🇳</span>
+          <div class="vname">Mai</div>
+          <div class="vdesc">Nữ · Neural2</div>
         </div>
-        <div class="voice-btn" data-voice="en-US-GuyNeural">
-          <span class="voice-flag">🇺🇸</span>
-          <div class="vname">Guy</div>
-          <div class="vdesc">Male · US · Neural</div>
+        <div class="voice-btn" data-voice="vi-VN-Neural2-D">
+          <span class="voice-flag">🇻🇳</span>
+          <div class="vname">Hùng</div>
+          <div class="vdesc">Nam · Neural2</div>
         </div>
-        <div class="voice-btn" data-voice="en-US-AriaNeural">
+      </div>
+      <!-- 🇺🇸 English -->
+      <div style="font-size:10px;color:#666;margin:10px 0 4px;letter-spacing:1px">🇺🇸 ENGLISH</div>
+      <div class="voice-group" id="voice-group-en">
+        <div class="voice-btn" data-voice="en-US-Journey-F">
           <span class="voice-flag">🇺🇸</span>
-          <div class="vname">Aria</div>
-          <div class="vdesc">Female · US · Expressive</div>
+          <div class="vname">Journey F</div>
+          <div class="vdesc">Female · Natural ⭐</div>
         </div>
-        <div class="voice-btn" data-voice="en-US-DavisNeural">
+        <div class="voice-btn" data-voice="en-US-Journey-D">
           <span class="voice-flag">🇺🇸</span>
-          <div class="vname">Davis</div>
-          <div class="vdesc">Male · US · Casual</div>
+          <div class="vname">Journey M</div>
+          <div class="vdesc">Male · Natural ⭐</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-Studio-O">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Studio F</div>
+          <div class="vdesc">Female · Studio ⭐</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-Studio-Q">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Studio M</div>
+          <div class="vdesc">Male · Studio ⭐</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-Neural2-F">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Neural F</div>
+          <div class="vdesc">Female · Neural2</div>
+        </div>
+        <div class="voice-btn" data-voice="en-US-Neural2-J">
+          <span class="voice-flag">🇺🇸</span>
+          <div class="vname">Neural M</div>
+          <div class="vdesc">Male · Neural2</div>
         </div>
       </div>
     </div>
@@ -154,6 +180,14 @@ button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weigh
           Chưa chọn → lưu vào Downloads
         </div>
       </div>
+      <!-- Quota tracker -->
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">📊 Quota tháng này</div>
+        <div style="background:#1a1a2e;border-radius:4px;height:6px;overflow:hidden">
+          <div id="quota-bar" style="height:100%;width:0%;background:#00e5a0;transition:width 0.3s"></div>
+        </div>
+        <div id="quota-label" style="font-size:10px;color:#666;margin-top:3px">0 / 1,000,000 ký tự tháng này</div>
+      </div>
       <div id="server-badge" style="margin-top:8px;font-size:12px;font-weight:600">🔴 Server chưa chạy</div>
       <div id="ws-error-tip" style="margin-top:10px;background:#ff475712;border:1px solid #ff475730;border-radius:8px;padding:10px;font-size:11px;color:#ff9999;line-height:1.8">
         ⚠️ <strong>Cần chạy server 1 lần:</strong><br>
@@ -169,7 +203,7 @@ button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weigh
 
 <script>
 // ─── State ─────────────────────────────────
-let selectedVoice = 'vi-VN-HoaiMyNeural';
+let selectedVoice = 'vi-VN-Neural2-A';
 let isStopped     = false;
 let saveDir       = null; // FileSystemDirectoryHandle khi dùng File System Access API
 
@@ -197,6 +231,30 @@ document.querySelectorAll('.voice-btn').forEach(btn => {
     selectedVoice = btn.dataset.voice;
   });
 });
+
+// ─── Quota tracker (Google Cloud free: 1M chars/tháng) ──
+const QUOTA_LIMIT = 1_000_000;
+function getQuotaKey() { return 'gcp_tts_' + new Date().toISOString().slice(0,7); }
+function getUsedChars() { return parseInt(localStorage.getItem(getQuotaKey()) || '0'); }
+function addUsedChars(n) {
+  const used = getUsedChars() + n;
+  localStorage.setItem(getQuotaKey(), used);
+  updateQuotaBar(used);
+  if (used > QUOTA_LIMIT * 0.9 && used - n <= QUOTA_LIMIT * 0.9) {
+    alert('⚠️ Đã dùng 90% quota miễn phí tháng này (' + used.toLocaleString() + '/1,000,000 ký tự).\nSau khi hết, Google sẽ tính phí ~$16/triệu ký tự.');
+  }
+}
+function updateQuotaBar(used) {
+  used = used || getUsedChars();
+  const pct = Math.min(100, used / QUOTA_LIMIT * 100);
+  const bar  = document.getElementById('quota-bar');
+  const lbl  = document.getElementById('quota-label');
+  if (!bar) return;
+  bar.style.width = pct + '%';
+  bar.style.background = pct > 90 ? '#ff4757' : pct > 70 ? '#ffa502' : '#00e5a0';
+  lbl.textContent = used.toLocaleString() + ' / 1,000,000 ký tự tháng này';
+}
+updateQuotaBar();
 
 // ─── Speed slider ──────────────────────────
 const speedSlider = document.getElementById('speed');
@@ -392,6 +450,7 @@ async function generateAll() {
       const blob = await synthesize(text, voice, ratePct);
       const dur = ((Date.now() - t0) / 1000).toFixed(1);
       updateLog(name, 'ok', dur + 's');
+      addUsedChars(text.length);
       generatedBlobs.push({ name, blob });
       await downloadBlob(blob, name + '.mp3');
       setProgress(i + 1, chunks.length);
