@@ -146,10 +146,14 @@ button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weigh
       <label>Bắt đầu từ số</label>
       <input type="number" id="start-num" value="1" min="1" max="999">
 
-      <p class="tips" style="margin-top:12px">
-        ℹ️ File lưu vào thư mục <strong style="color:#ccc">Downloads</strong>.<br>
-        Nếu bị chặn tải nhiều file → nhấn <strong style="color:#ccc">Cho phép</strong> khi trình duyệt hỏi.
-      </p>
+      <div style="margin-top:12px">
+        <button id="btn-pick-dir" style="width:100%;padding:8px;background:#1a1a2e;border:1px solid #00e5a040;border-radius:8px;color:#00e5a0;cursor:pointer;font-size:12px;font-weight:600">
+          📁 Chọn thư mục lưu file
+        </button>
+        <div id="dir-label" style="margin-top:6px;font-size:11px;color:#888;word-break:break-all">
+          Chưa chọn → lưu vào Downloads
+        </div>
+      </div>
       <div id="server-badge" style="margin-top:8px;font-size:12px;font-weight:600">🔴 Server chưa chạy</div>
       <div id="ws-error-tip" style="margin-top:10px;background:#ff475712;border:1px solid #ff475730;border-radius:8px;padding:10px;font-size:11px;color:#ff9999;line-height:1.8">
         ⚠️ <strong>Cần chạy server 1 lần:</strong><br>
@@ -166,7 +170,23 @@ button{border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weigh
 <script>
 // ─── State ─────────────────────────────────
 let selectedVoice = 'vi-VN-HoaiMyNeural';
-let isStopped = false;
+let isStopped     = false;
+let saveDir       = null; // FileSystemDirectoryHandle khi dùng File System Access API
+
+// ─── Chọn thư mục lưu ──────────────────────
+document.getElementById('btn-pick-dir').addEventListener('click', async () => {
+  if (!window.showDirectoryPicker) {
+    alert('Trình duyệt chưa hỗ trợ. Dùng Chrome/Edge/Cốc Cốc phiên bản mới.');
+    return;
+  }
+  try {
+    saveDir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    document.getElementById('dir-label').textContent = '📂 ' + saveDir.name;
+    document.getElementById('dir-label').style.color = '#00e5a0';
+  } catch (e) {
+    if (e.name !== 'AbortError') alert('Lỗi chọn thư mục: ' + e.message);
+  }
+});
 let generatedBlobs = []; // { name, blob }
 
 // ─── Voice selection ───────────────────────
@@ -281,8 +301,20 @@ async function synthesize(text, voice, ratePct) {
   return await resp.blob();
 }
 
-// ─── Download a blob ───────────────────────
-function downloadBlob(blob, filename) {
+// ─── Lưu file: ưu tiên thư mục đã chọn, fallback về Downloads ───
+async function downloadBlob(blob, filename) {
+  if (saveDir) {
+    try {
+      const fh = await saveDir.getFileHandle(filename, { create: true });
+      const wr = await fh.createWritable();
+      await wr.write(blob);
+      await wr.close();
+      return;
+    } catch (e) {
+      console.warn('[save] File System API lỗi:', e.message, '→ fallback Downloads');
+    }
+  }
+  // Fallback: tải về Downloads như cũ
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = filename; a.style.display = 'none';
@@ -361,9 +393,9 @@ async function generateAll() {
       const dur = ((Date.now() - t0) / 1000).toFixed(1);
       updateLog(name, 'ok', dur + 's');
       generatedBlobs.push({ name, blob });
-      downloadBlob(blob, name + '.mp3');
+      await downloadBlob(blob, name + '.mp3');
       setProgress(i + 1, chunks.length);
-      await sleep(350); // tránh browser block multi-download
+      if (!saveDir) await sleep(350); // tránh browser block multi-download
     } catch (err) {
       updateLog(name, 'err', err.message);
       setProgress(i + 1, chunks.length);
